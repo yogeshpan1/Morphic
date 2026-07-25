@@ -35,3 +35,24 @@ def convert_file(input_path, target_format):
         str(input_path),
     ]
 
+    result = subprocess.run(
+        command,
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+
+    if result.returncode != 0:
+        raise ConversionError(
+            f'LibreOffice failed (exit code {result.returncode}): {result.stderr}'
+        )
+
+    output_filename = input_path.stem + '.' + target_format
+    output_path = output_dir / output_filename
+
+    if not output_path.exists():
+        raise ConversionError(
+            f'Conversion command ran but output file was not found: {output_path}'
+        )
+
+    return output_path
